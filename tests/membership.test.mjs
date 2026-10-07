@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {initial,validate,report} from '../public/core.js';
+import {upgrade} from '../public/care.js';
+import {newBatch,memberSummary,memberReadiness} from '../public/membership.js';
+const fixture=()=>{const p=upgrade(initial());p.sector='뷰티, 향수';p.recommended=p.venues[0].id;const b=newBatch(p);Object.assign(b,{cohort:'합성 동일 방문객',period:'합성 하루',source:'합성 중복 제거 집계',total:150,existing:40,unknown:10,counts:[100,70,40,25,10],complaints:2,followupDefinition:'가상 혜택 이용',followupWindow:'가상 14일 종료'});p.membership.batches.push(b);return {p,b};};
+test('가입 지표의 분모에서 기존 회원과 미확인을 제외한다',()=>{const {b}=fixture(),a=memberSummary(b);assert.equal(a.conversion,25);assert.equal(a.completion,62.5);assert.equal(a.followup,40);assert.equal(a.complaintRate,2/70*100);assert.equal(a.largest.length,2);});
+test('실제 집계의 완료 근거 없이는 완료와 후속 비율을 만들지 않는다',()=>{const {b}=fixture();b.kind='실제 집계';let a=memberSummary(b);assert.equal(a.conversion,null);assert.equal(a.rows[3].rate,null);b.completionProof='가입 완료 집계 확인';assert.equal(memberSummary(b).conversion,25);b.followupWindow='';assert.equal(memberSummary(b).followup,null);});
+test('미측정과 0명, 0분모를 구분한다',()=>{const {b}=fixture();b.counts=[null,null,null,null,null];b.total=b.existing=b.unknown=b.complaints=null;assert.equal(memberSummary(b).conversion,null);b.counts=[0,0,0,0,0];assert.equal(memberSummary(b).completion,null);});
+test('분류 합계와 단계 순서, 불편 인원 범위를 검사한다',()=>{const {b}=fixture();b.total=149;assert.ok(memberSummary(b).error);b.total=151;assert.ok(memberSummary(b).error);b.total=150;b.counts[2]=71;assert.ok(memberSummary(b).error);b.counts[2]=40;b.complaints=71;assert.ok(memberSummary(b).error);b.complaints=2;b.source='';assert.ok(memberSummary(b).error);});
+test('추천 장소가 바뀌어도 기존 집계의 장소를 바꾸지 않는다',()=>{const {p,b}=fixture();const before=b.venueId;p.recommended=p.venues[1].id;assert.equal(b.venueId,before);assert.equal(newBatch(p).venueId,p.venues[1].id);});
+test('회원 기획, 집계 백업과 기획서가 장소 및 수치를 보존한다',()=>{const {p}=fixture();p.membership.program='가상 회원 프로그램';const q=validate(JSON.parse(JSON.stringify(p)));assert.equal(q.membership.batches[0].counts[3],25);assert.equal(q.recommended,p.recommended);assert.match(report(q),/25.0%/);assert.match(report(q),/가상 회원 프로그램/);assert.match(report(q),/가상 연습/);});
+test('잘못된 회원 백업 형식과 존재하지 않는 공간을 거부한다',()=>{const {p,b}=fixture();b.counts[0]='100';assert.throws(()=>validate(p));b.counts[0]=100;b.venueId=crypto.randomUUID();assert.throws(()=>validate(p));});
+test('준비 상태는 장소와 고객, 근거, 선택권, 후속 계획을 각각 확인한다',()=>{const {p}=fixture();assert.ok(memberReadiness(p).every(x=>!x.ok));p.membership.segment='관심 고객';p.membership.locationReason='현장 조사 필요';assert.equal(memberReadiness(p)[0].ok,true);assert.equal(memberReadiness(p)[1].ok,false);});

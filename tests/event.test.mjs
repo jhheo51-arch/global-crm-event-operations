@@ -1,0 +1,19 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {initial,validate,report} from '../public/core.js';
+import {upgrade} from '../public/care.js';
+import {newGuest,newTask,transitionGuest,undoGuest,eventStats,bookings,syncArrivals,gaps,closeEvent,slots} from '../public/event.js';
+import {eventView,eventTabs} from '../public/event-ui.js';
+import {eventCases} from '../public/event-cases.js';
+const project=()=>upgrade(initial(true));
+function guest(p,party=1){const g={...newGuest(),alias:'가상 A',reason:'테스트',owner:'접수',party,slot:slots(p)[0]};p.event.guests.push(g);return g;}
+const move=(p,g,to,min)=>transitionGuest(p,g.id,to,new Date(Date.UTC(2026,9,6,1,min)).toISOString());
+test('초청부터 퇴장까지 순서를 지키며 중복 처리하지 않는다',()=>{const p=project(),g=guest(p,2);assert.throws(()=>move(p,g,'대기',0));['초청','확정','대기','체험','완료','퇴장'].forEach((to,i)=>move(p,g,to,i*5));assert.throws(()=>move(p,g,'퇴장',31));const s=eventStats(p);assert.equal(s.arrived,2);assert.equal(s.attendance,100);assert.equal(s.completion,100);assert.equal(s.wait,5);assert.equal(gaps(p).filter(x=>x.tab==='후속').length,1);});
+test('동반 포함 시간대 정원과 취소 후 재초청을 정확히 계산한다',()=>{const p=project();p.event.slotCap=2;const a=guest(p,2),b=guest(p);move(p,a,'초청',0);move(p,a,'확정',1);move(p,b,'초청',2);assert.throws(()=>move(p,b,'확정',3),/정원/);move(p,a,'불참',4);move(p,a,'초청',5);assert.equal(bookings(p)[0].count,0);move(p,b,'확정',6);assert.equal(eventStats(p).confirmed,1);});
+test('예약 계획을 반영해도 고객 원본과 나머지 계산 조건을 보존한다',()=>{const p=project(),g=guest(p,2);move(p,g,'초청',0);move(p,g,'확정',1);const before=JSON.stringify(p.event);p.ops.factor=2;syncArrivals(p);assert.equal(p.ops.factor,1);assert.equal(p.ops.arrivals.split(',').map(Number).reduce((a,b)=>a+b),2);assert.equal(JSON.stringify(p.event),before);p.ops.start=15;assert.throws(()=>syncArrivals(p),/운영시간/);});
+test('미방문은 자동 단정하지 않고 확인 이후 참석률에 반영한다',()=>{const p=project(),a=guest(p),b=guest(p);for(const g of [a,b]){move(p,g,'초청',0);move(p,g,'확정',1);}move(p,a,'대기',2);move(p,b,'미방문',3);assert.equal(eventStats(p).attendance,50);undoGuest(p,b.id);assert.equal(b.status,'확정');assert.ok(gaps(p).some(x=>x.text.includes('도착 또는 미방문')));});
+test('빈 지표는 0이 아니라 미측정이며 이탈은 완료율 분모에 남는다',()=>{const p=project();assert.equal(eventStats(p).response,null);assert.equal(eventStats(p).completion,null);const g=guest(p);['초청','확정','대기','조기퇴장'].forEach((to,i)=>move(p,g,to,i));assert.equal(eventStats(p).completion,0);assert.equal(eventStats(p).wait,null);});
+test('업무, 후속 완료에 담당자와 근거를 요구하고 종료를 막는다',()=>{const p=project();p.date='2026-10-06';p.purpose='검토';p.event.owner='총괄';p.recommended=p.venues[0].id;const t={...newTask(),title:'정산',phase:'정산',status:'완료'};p.event.tasks.push(t);p.event.expenses=[{name:'지출 없음',amount:0,evidence:'정산 확인'}];p.event.review='회고';assert.throws(()=>closeEvent(p));Object.assign(t,{owner:'총괄',evidence:'확인'});closeEvent(p);assert.ok(p.event.closedAt);t.due='2026-01-01';t.status='대기';assert.ok(gaps(p,'2026-10-06').some(x=>x.text.includes('기한 지남')));});
+test('새 운영기록은 백업, 전체보고서에서 유지되고 위조된 단계는 거부한다',()=>{const p=project(),g=guest(p);move(p,g,'초청',0);move(p,g,'확정',1);const restored=validate(JSON.parse(JSON.stringify(p)),{draft:true});assert.equal(restored.event.guests[0].status,'확정');assert.ok(report(restored).includes('이벤트 전체 운영 기록'));restored.event.guests[0].status='퇴장';assert.throws(()=>validate(restored,{draft:true}));});
+test('모든 행사 화면이 빈 기록과 사용자 특수문자를 처리한다',()=>{const p=project();const g=guest(p);g.alias='<script>alert(1)</script>';const esc=x=>String(x??'').replaceAll('<','&lt;').replaceAll('>','&gt;');const helpers={field:()=>'',btn:t=>t,note:esc,esc};for(const tab of eventTabs){const html=eventView(p,helpers,tab);assert.ok(html.includes('놓치지 말아야 할'));assert.ok(!html.includes('<script>'));}assert.equal(eventCases.length,5);assert.ok(eventCases.find(x=>x.id==='nuflaat').level.includes('팝업으로 분류하지 않음'));});
+
