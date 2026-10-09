@@ -4,6 +4,12 @@ VIP 행사의 초청 이유부터 행사 후 담당 업무까지 연결하는 �
 
 [SCENT LOOP 소개 PDF](public/downloads/SCENT-LOOP-Global-CRM-Portfolio.pdf) | [Excel 운영표](public/downloads/SCENT-LOOP-CRM-Operations.xlsx) | [문서 안내](docs/README.md)
 
+## 30초 안내
+
+- **문제:** VIP 행사 전후의 고객 정보, 수신 동의, 담당 업무가 흩어지면 다음 행동이 누락될 수 있습니다.
+- **바로 보기:** [화면 미리보기](assets/project-overview.png), [소개 PDF](public/downloads/SCENT-LOOP-Global-CRM-Portfolio.pdf), [Excel 운영표](public/downloads/SCENT-LOOP-CRM-Operations.xlsx)에서 고객 흐름과 인계 기준을 확인합니다.
+- **확인 범위:** 가상 행사와 공개 조사 자료를 바탕으로 한 개인 포트폴리오입니다. 실제 고객 자료와 운영 성과는 포함하지 않습니다.
+
 ## 소개
 
 아이아이컴바인드의 Global CRM Marketing Specialist 공고를 읽고, 이 업무를 맡는다면 행사 전후 고객 정보를 어떻게 관리할지 정리했습니다. 초청 이유, 현장 경험, 마케팅 동의와 상담 요청이 서로 다른 문서에 흩어지면 행사 후 담당자가 다음 행동을 놓칠 수 있다고 봤습니다.
