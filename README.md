@@ -2,7 +2,7 @@
 
 VIP 행사의 초청 이유부터 행사 후 담당 업무까지 연결하는 고객 관계 관리(CRM) 운영안입니다.
 
-[SCENT LOOP 소개 PDF](public/downloads/SCENT-LOOP-Global-CRM-Portfolio.pdf) | [Excel 운영표](public/downloads/SCENT-LOOP-CRM-Operations.xlsx) | [프로젝트 기획안](PROJECT-PLAN.md)
+[SCENT LOOP 소개 PDF](public/downloads/SCENT-LOOP-Global-CRM-Portfolio.pdf) | [Excel 운영표](public/downloads/SCENT-LOOP-CRM-Operations.xlsx) | [문서 안내](docs/README.md)
 
 ## 소개
 
@@ -35,7 +35,7 @@ VIP 행사의 초청 이유부터 행사 후 담당 업무까지 연결하는 �
 
 ## 가상 자료와 측정 기준
 
-가상 초청 고객 240명을 기존 우수·재구매 고객 70명, 고관여 잠재 고객 80명, 콘텐츠 크리에이터 30명, 휴면 VIP 60명으로 나눴습니다. 각 그룹의 선정 이유와 다음 연락 조건은 [기획안](PROJECT-PLAN.md)에 있습니다.
+가상 초청 고객 240명을 기존 우수·재구매 고객 70명, 고관여 잠재 고객 80명, 콘텐츠 크리에이터 30명, 휴면 VIP 60명으로 나눴습니다. 각 그룹의 선정 이유와 다음 연락 조건은 [기획안](docs/PROJECT-PLAN.md)에 있습니다.
 
 계산용 흐름은 초청 240명 → 참석 의사 응답 156명 → 방문 확정 132명 → 참석 116명 → 체험 104명 → 마케팅 동의 82명 → 후속 반응 47명 → 관계 행동 28명입니다. 각 단계의 분모를 고정하고 참석과 마케팅 동의를 따로 셉니다. 이 수치는 실제 행사 성과가 아닙니다.
 
@@ -58,7 +58,7 @@ npm ci
 npm start
 ```
 
-터미널에 표시된 주소를 브라우저로 엽니다. 서울시 데이터 연결 설정은 [실행 안내](RUNNING.md)를 참고하세요.
+터미널에 표시된 주소를 브라우저로 엽니다. 서울시 데이터 연결 설정은 [실행 안내](docs/RUNNING.md)를 참고하세요.
 
 ```sh
 npm test
@@ -70,10 +70,10 @@ node verify-worker.mjs
 
 | 목적 | 위치 |
 |---|---|
-| 요구사항과 완료 조건 | [제품 기획서](PRD.md) |
-| 고객군, 일정과 측정 기준 | [프로젝트 기획안](PROJECT-PLAN.md) |
-| 조사 원문과 사용 범위 | [조사 자료](RESEARCH-SOURCES.md) |
-| 직무 연결과 남은 확인 | [기획 판단과 검증 과제](PROJECT-NOTES.md) |
+| 요구사항과 완료 조건 | [제품 기획서](docs/PRD.md) |
+| 고객군, 일정과 측정 기준 | [프로젝트 기획안](docs/PROJECT-PLAN.md) |
+| 조사 원문과 사용 범위 | [조사 자료](docs/RESEARCH-SOURCES.md) |
+| 직무 연결과 남은 확인 | [기획 판단과 검증 과제](docs/PROJECT-NOTES.md) |
 | 구현과 자동 검사 | [웹 코드](public/), [자동 검사](tests/) |
 
 제작자가 기획 범위와 판단 기준을 정하고 문구, 화면과 계산식을 확인했습니다. 실제 고객 명단이나 내부 매출은 사용하지 않았으며 초청장 발송, 회원 가입과 결제는 진행하지 않았습니다.
