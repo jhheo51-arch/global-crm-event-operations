@@ -221,7 +221,7 @@ def build_pdf():
         table(source_rows, [31 * mm, 61 * mm, 86 * mm], font_size=9.1, compact=True, first_col_bold=True),
         Spacer(1, 3 * mm), p("입사 후 포부", h3), Spacer(1, 3 * mm),
         p("입사 후에는 회사의 CRM 정의와 현장 운영 기준을 먼저 확인하겠습니다. 작은 행사 한 건에서 선정, 체험, 동의와 후속 기록을 실제 데이터로 검증하고, 리테일, 콘텐츠, 디자인과 현지팀이 사용할 수 있는 운영 기준으로 정리하겠습니다.", quote),
-        Spacer(1, 4 * mm), p("상세 출처와 한계는 RESEARCH-SOURCES.md와 Excel의 ‘근거 및 출처’ 시트에 있습니다.", note),
+        Spacer(1, 4 * mm), p("상세 출처와 한계는 docs/RESEARCH-SOURCES.md와 Excel의 ‘근거 및 출처’ 시트에 있습니다.", note),
     ]
     doc.build(story, onFirstPage=footer, onLaterPages=footer)
 
